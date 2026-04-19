@@ -1,20 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'services/auth_service.dart';
 
 void main() {
   runApp(const MyApp());
 }
+
+/* ---------------- APP ROOT ---------------- */
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const RegisterScreen(),
+      home: SplashCheck(),
     );
   }
 }
+
+/* ---------------- SPLASH CHECK (AUTO LOGIN) ---------------- */
+
+class SplashCheck extends StatefulWidget {
+  const SplashCheck({super.key});
+
+  @override
+  State<SplashCheck> createState() => _SplashCheckState();
+}
+
+class _SplashCheckState extends State<SplashCheck> {
+  @override
+  void initState() {
+    super.initState();
+    checkUser();
+  }
+
+  void checkUser() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? name = prefs.getString("user_name");
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (name != null) {
+      // 👉 GO TO HOME
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen(userName: name)),
+      );
+    } else {
+      // 👉 GO TO REGISTER
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => RegisterScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+}
+
+/* ---------------- REGISTER SCREEN ---------------- */
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -28,29 +78,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final ageController = TextEditingController();
   final dobController = TextEditingController();
 
-  void register() {
+  void register() async {
     String name = nameController.text.trim();
     String age = ageController.text.trim();
     String dob = dobController.text.trim();
 
-    // ✅ Empty validation
     if (name.isEmpty || age.isEmpty || dob.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      ).showSnackBar(const SnackBar(content: Text("Fill all fields")));
       return;
     }
 
-    // ✅ Age validation
-    if (int.tryParse(age) == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Enter valid age")));
-      return;
-    }
+    await AuthService.registerUser(name: name, age: age, dob: dob);
 
-    // ✅ Navigate to Home
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => HomeScreen(userName: name)),
     );
@@ -59,86 +101,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Register",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Register",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
 
-                const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-                // 👤 Name
-                TextField(
-                  controller: nameController,
-                  decoration: inputStyle("Name"),
-                ),
+              TextField(
+                controller: nameController,
+                decoration: inputStyle("Name"),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                // 🔢 Age
-                TextField(
-                  controller: ageController,
-                  keyboardType: TextInputType.number,
-                  decoration: inputStyle("Age"),
-                ),
+              TextField(
+                controller: ageController,
+                keyboardType: TextInputType.number,
+                decoration: inputStyle("Age"),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                // 📅 Date of Birth
-                TextField(
-                  controller: dobController,
-                  readOnly: true,
-                  decoration: inputStyle("Date of Birth"),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime(2000),
-                      firstDate: DateTime(1950),
-                      lastDate: DateTime.now(),
-                    );
+              TextField(
+                controller: dobController,
+                readOnly: true,
+                decoration: inputStyle("DOB"),
+                onTap: () async {
+                  DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime(2000),
+                    firstDate: DateTime(1950),
+                    lastDate: DateTime.now(),
+                  );
 
-                    if (pickedDate != null) {
-                      setState(() {
-                        dobController.text =
-                            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-                      });
-                    }
-                  },
-                ),
+                  if (picked != null) {
+                    setState(() {
+                      dobController.text =
+                          "${picked.day}/${picked.month}/${picked.year}";
+                    });
+                  }
+                },
+              ),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-                // 🔘 Register Button
-                ElevatedButton(
-                  onPressed: register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 15,
-                    ),
-                  ),
-                  child: const Text("Register"),
-                ),
-              ],
-            ),
+              ElevatedButton(
+                onPressed: register,
+                child: const Text("Register"),
+              ),
+            ],
           ),
         ),
       ),
@@ -146,20 +164,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 }
 
-// 🎨 Input Style
+/* ---------------- INPUT STYLE ---------------- */
+
 InputDecoration inputStyle(String hint) {
   return InputDecoration(
     hintText: hint,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
-    ),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
   );
 }
 
-// 🏠 Home Screen
+/* ---------------- HOME SCREEN ---------------- */
+
 class HomeScreen extends StatelessWidget {
   final String userName;
 
@@ -172,7 +187,7 @@ class HomeScreen extends StatelessWidget {
         title: Text("Welcome $userName"),
         backgroundColor: Colors.deepPurple,
       ),
-      body: const Center(child: Text("Home Screen (To-Do UI coming next)")),
+      body: const Center(child: Text("Home Screen")),
     );
   }
 }
