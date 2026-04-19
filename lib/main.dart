@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/* ---------------- SPLASH CHECK (AUTO LOGIN) ---------------- */
+/* ---------------- SPLASH CHECK ---------------- */
 
 class SplashCheck extends StatefulWidget {
   const SplashCheck({super.key});
@@ -38,24 +38,26 @@ class _SplashCheckState extends State<SplashCheck> {
 
   void checkUser() async {
     final prefs = await SharedPreferences.getInstance();
-
     String? name = prefs.getString("user_name");
 
     await Future.delayed(const Duration(seconds: 1));
 
-    if (name != null) {
-      // 👉 GO TO HOME
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen(userName: name)),
-      );
-    } else {
-      // 👉 GO TO REGISTER
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => RegisterScreen()),
-      );
-    }
+    if (!mounted) return;
+
+    // 🔥 SAFE NAVIGATION FIX
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (name != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen(userName: name)),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+        );
+      }
+    });
   }
 
   @override
@@ -92,6 +94,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     await AuthService.registerUser(name: name, age: age, dob: dob);
 
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => HomeScreen(userName: name)),
@@ -111,7 +115,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 "Register",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
-
               const SizedBox(height: 20),
 
               TextField(
