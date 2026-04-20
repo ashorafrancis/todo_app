@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'services/storage_service.dart';
+import 'views/register_page.dart';
+import 'views/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await StorageService.init();
   runApp(const MyApp());
 }
 
@@ -9,9 +14,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    bool isRegistered = StorageService.isRegistered();
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(body: Center(child: Text("Todo App Starting Point"))),
+      home: isRegistered ? const HomePage() : const RegisterPage(),
     );
   }
 }
