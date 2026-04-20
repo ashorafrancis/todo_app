@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'views/splash/splash_view.dart';
 
 void main() {
   runApp(const MyApp());
 }
-
-/* ---------------- APP ROOT ---------------- */
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -14,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashView(),
+      home: Scaffold(body: Center(child: Text("Todo App Starting Point"))),
     );
   }
 }
