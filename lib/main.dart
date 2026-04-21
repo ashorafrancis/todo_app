@@ -1,24 +1,50 @@
 import 'package:flutter/material.dart';
-import 'services/storage_service.dart';
-import 'views/register_page.dart';
-import 'views/home_page.dart';
+import 'package:get/get.dart';
+import 'routes/app_pages.dart';
+import 'controllers/auth_controller.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await StorageService.init();
-  runApp(const MyApp());
+void main() {
+  Get.put(AuthController()); // ✅ FIX for your error
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    bool isRegistered = StorageService.isRegistered();
-
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: isRegistered ? const HomePage() : const RegisterPage(),
+      title: "Todo App",
+      theme: ThemeData(
+        primaryColor: Colors.deepPurple,
+        scaffoldBackgroundColor: Color(0xFFF5F6FA),
+
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.deepPurple,
+          centerTitle: true,
+          elevation: 0,
+        ),
+
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            padding: EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+      initialRoute: AppPages.initial,
+      getPages: AppPages.routes,
     );
   }
 }

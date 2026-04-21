@@ -1,20 +1,21 @@
-import 'dart:convert';
-
 class TaskModel {
   String title;
+  String date;
   bool isDone;
 
-  TaskModel({required this.title, this.isDone = false});
+  TaskModel({required this.title, required this.date, this.isDone = false});
 
-  Map<String, dynamic> toMap() => {'title': title, 'isDone': isDone};
+  Map<String, dynamic> toJson() => {
+    "title": title,
+    "date": date,
+    "isDone": isDone,
+  };
 
-  factory TaskModel.fromMap(Map<String, dynamic> map) {
-    return TaskModel(title: map['title'], isDone: map['isDone']);
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    return TaskModel(
+      title: json["title"],
+      date: json["date"],
+      isDone: json["isDone"] ?? false,
+    );
   }
-
-  static String encode(List<TaskModel> tasks) =>
-      json.encode(tasks.map((e) => e.toMap()).toList());
-
-  static List<TaskModel> decode(String tasks) =>
-      (json.decode(tasks) as List).map((e) => TaskModel.fromMap(e)).toList();
 }

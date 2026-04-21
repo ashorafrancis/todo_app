@@ -1,41 +1,41 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../models/task_model.dart';
-import 'dart:convert';
 
 class StorageService {
-  static late SharedPreferences prefs;
-
-  static Future init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
-
-  static bool isRegistered() {
-    return prefs.getBool('registered') ?? false;
-  }
-
-  static void saveUser(UserModel user) {
+  Future<void> saveUser(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
     prefs.setString('user', jsonEncode(user.toJson()));
-    prefs.setBool('registered', true);
   }
 
-  static UserModel? getUser() {
-    String? data = prefs.getString('user');
-    if (data == null) return null;
-    return UserModel.fromJson(data);
+  Future<UserModel?> getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('user');
+    if (data != null) {
+      return UserModel.fromJson(jsonDecode(data));
+    }
+    return null;
   }
 
-  static void saveTasks(List<TaskModel> tasks) {
-    prefs.setString('tasks', TaskModel.encode(tasks));
+  Future<void> saveTasks(List<TaskModel> tasks) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('tasks', jsonEncode(tasks.map((e) => e.toJson()).toList()));
   }
 
-  static List<TaskModel> getTasks() {
-    String? data = prefs.getString('tasks');
-    if (data == null) return [];
-    return TaskModel.decode(data);
+  Future<List<TaskModel>> getTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('tasks');
+    if (data != null) {
+      return (jsonDecode(data) as List)
+          .map((e) => TaskModel.fromJson(e))
+          .toList();
+    }
+    return [];
   }
 
-  static void logout() {
+  Future<void> clear() async {
+    final prefs = await SharedPreferences.getInstance();
     prefs.clear();
   }
 }
