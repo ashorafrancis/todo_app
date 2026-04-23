@@ -50,17 +50,19 @@ class _ProfileViewState extends State<ProfileView> {
     Navigator.pop(context);
   }
 
+  // 🔥 AVATAR PICKER
   void openAvatarPicker() {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (_) {
-        return Container(
+        return Padding(
           padding: const EdgeInsets.all(20),
           child: Wrap(
-            spacing: 15,
+            spacing: 20,
+            runSpacing: 20,
             children: List.generate(avatars.length, (index) {
               return GestureDetector(
                 onTap: () => saveAvatar(index),
@@ -81,6 +83,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
+  // 🔥 EDIT PROFILE
   void editProfileDialog() {
     final user = controller.user.value;
 
@@ -102,20 +105,23 @@ class _ProfileViewState extends State<ProfileView> {
     }
 
     Get.defaultDialog(
-      radius: 15,
       title: "Edit Profile",
       content: Column(
         children: [
-          buildField("Name", nameCtrl),
-          buildField("Age", ageCtrl, isNumber: true),
-          GestureDetector(
+          TextField(
+            controller: nameCtrl,
+            decoration: const InputDecoration(labelText: "Name"),
+          ),
+          TextField(
+            controller: ageCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: "Age"),
+          ),
+          TextField(
+            controller: dobCtrl,
+            readOnly: true,
             onTap: pickDate,
-            child: AbsorbPointer(
-              child: TextField(
-                controller: dobCtrl,
-                decoration: inputDecoration("Date of Birth"),
-              ),
-            ),
+            decoration: const InputDecoration(labelText: "DOB"),
           ),
         ],
       ),
@@ -132,7 +138,6 @@ class _ProfileViewState extends State<ProfileView> {
         }
 
         controller.register(nameCtrl.text, ageCtrl.text, dobCtrl.text);
-
         Get.back();
       },
     );
@@ -143,191 +148,135 @@ class _ProfileViewState extends State<ProfileView> {
     final user = controller.user.value;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-      body: Column(
+      backgroundColor: const Color(0xFFF2F3F7),
+      body: Stack(
         children: [
-          // 🔥 MODERN HEADER (ONLY AVATAR CHANGED)
+          // 🔥 TOP GRADIENT
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+            height: 220,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF5F2EEA), Color(0xFF8E2DE2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(35),
-                bottomRight: Radius.circular(35),
               ),
             ),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: openAvatarPicker,
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 45,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        avatars[selectedAvatar],
-                        size: 45,
-                        color: const Color(0xFF5F2EEA),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  user?.name?.isNotEmpty == true ? user!.name : "No Name",
-                  style: const TextStyle(
+          ),
+
+          // 🔥 CONTENT
+          Column(
+            children: [
+              const SizedBox(height: 140),
+
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        user?.name ?? "No Name",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      buildRow(Icons.cake, "Age", user?.age ?? ""),
+                      const Divider(),
+                      buildRow(Icons.calendar_month, "DOB", user?.dob ?? ""),
+
+                      const Spacer(),
+
+                      // ✏️ EDIT BUTTON
+                      ElevatedButton.icon(
+                        onPressed: editProfileDialog,
+                        icon: const Icon(Icons.edit, color: Colors.white),
+                        label: const Text(
+                          "Edit Profile",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5F2EEA),
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // ⚫ LOGOUT (MINIMAL GREY)
+                      ElevatedButton.icon(
+                        onPressed: controller.logout,
+                        icon: const Icon(Icons.logout, color: Colors.black),
+                        label: const Text(
+                          "Logout",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Welcome back 👋",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 25),
-
-          // 📦 INFO CARD (UNCHANGED)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+          // 🔥 AVATAR
+          Positioned(
+            top: 100,
+            left: MediaQuery.of(context).size.width / 2 - 50,
+            child: GestureDetector(
+              onTap: openAvatarPicker,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  avatars[selectedAvatar],
+                  size: 50,
+                  color: const Color(0xFF5F2EEA),
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                buildRow(Icons.cake, "Age", user?.age ?? ""),
-                const Divider(),
-                buildRow(Icons.calendar_month, "DOB", user?.dob ?? ""),
-              ],
+              ),
             ),
           ),
-
-          const Spacer(),
-
-          // 🎯 BUTTONS (UNCHANGED)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5F2EEA),
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 3,
-                  ),
-                  onPressed: editProfileDialog,
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                  label: const Text(
-                    "Edit Profile",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  onPressed: controller.logout,
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    "Logout",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
   Widget buildRow(IconData icon, String title, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.grey),
-        const SizedBox(width: 10),
-        Text(title, style: const TextStyle(color: Colors.grey)),
-        const Spacer(),
-        Text(
-          value.isEmpty ? "-" : value,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  Widget buildField(
-    String label,
-    TextEditingController ctrl, {
-    bool isNumber = false,
-  }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: ctrl,
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-        decoration: inputDecoration(label),
-      ),
-    );
-  }
-
-  InputDecoration inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      filled: true,
-      fillColor: Colors.grey[100],
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey),
+          const SizedBox(width: 10),
+          Text(title),
+          const Spacer(),
+          Text(
+            value.isEmpty ? "-" : value,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
