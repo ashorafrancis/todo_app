@@ -96,7 +96,7 @@ class RegisterView extends StatelessWidget {
                     child: const Text(
                       "Register",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.white, // ✅ FIX
                         fontWeight: FontWeight.bold,
                       ),
                     ),

@@ -4,7 +4,7 @@ import 'routes/app_pages.dart';
 import 'controllers/auth_controller.dart';
 
 void main() {
-  Get.put(AuthController()); // ✅ FIX for your error
+  Get.put(AuthController());
   runApp(MyApp());
 }
 
@@ -15,28 +15,17 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Todo App",
       theme: ThemeData(
-        primaryColor: Colors.deepPurple,
-        scaffoldBackgroundColor: Color(0xFFF5F6FA),
+        primaryColor: const Color(0xFF6C63FF),
+        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
 
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.deepPurple,
-          centerTitle: true,
-          elevation: 0,
-        ),
-
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(fontSize: 14),
+          titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
-            padding: EdgeInsets.symmetric(vertical: 14),
+            backgroundColor: const Color(0xFF6C63FF),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),

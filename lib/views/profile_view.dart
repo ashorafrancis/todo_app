@@ -215,19 +215,20 @@ class _ProfileViewState extends State<ProfileView> {
 
                       const SizedBox(height: 10),
 
-                      // ⚫ LOGOUT (MINIMAL GREY)
+                      // 🔥 LIGHTER LOGOUT BUTTON
                       ElevatedButton.icon(
                         onPressed: controller.logout,
-                        icon: const Icon(Icons.logout, color: Colors.black),
+                        icon: const Icon(Icons.logout, color: Colors.black87),
                         label: const Text(
                           "Logout",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.black87,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[300],
+                          backgroundColor: Colors.grey.shade200, // ✅ lighter
+                          elevation: 0,
                           minimumSize: const Size(double.infinity, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

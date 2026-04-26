@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart'; // ✅ NEW
 import '../controllers/task_controller.dart';
 import '../routes/app_routes.dart';
 
@@ -31,6 +32,7 @@ class _HomeViewState extends State<HomeView> {
     loadAvatar();
   }
 
+  // 🔥 LOAD AVATAR
   Future<void> loadAvatar() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -38,7 +40,13 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // 🔥 RESTORED ADD / EDIT TASK DIALOG (THIS WAS MISSING)
+  // 🔥 TODAY DATE
+  String getTodayDate() {
+    final now = DateTime.now();
+    return DateFormat("EEEE, MMM d").format(now);
+  }
+
+  // 🔥 ADD / EDIT TASK DIALOG
   void openTaskDialog({int? index}) {
     final taskCtrl = TextEditingController();
     final dateCtrl = TextEditingController();
@@ -49,10 +57,13 @@ class _HomeViewState extends State<HomeView> {
     }
 
     Future<void> pickDate() async {
+      DateTime now = DateTime.now();
+      DateTime today = DateTime(now.year, now.month, now.day);
+
       DateTime? picked = await showDatePicker(
         context: Get.context!,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        initialDate: today,
+        firstDate: today,
         lastDate: DateTime(2100),
       );
 
@@ -86,6 +97,15 @@ class _HomeViewState extends State<HomeView> {
           return;
         }
 
+        DateTime selectedDate = DateTime.parse(dateCtrl.text);
+        DateTime now = DateTime.now();
+        DateTime today = DateTime(now.year, now.month, now.day);
+
+        if (selectedDate.isBefore(today)) {
+          Get.snackbar("Error", "Cannot select past date");
+          return;
+        }
+
         if (index == null) {
           controller.addTask(taskCtrl.text, dateCtrl.text);
         } else {
@@ -99,14 +119,12 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final avatarsList = avatars;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
 
       body: Column(
         children: [
-          // 🔥 HEADER (ONLY AVATAR UPDATED)
+          // 🔥 HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 45, 20, 20),
@@ -125,17 +143,29 @@ class _HomeViewState extends State<HomeView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Hello 👋",
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Hello 👋",
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                        Text(
+                          getTodayDate(), // ✅ NEW DATE
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-
                     GestureDetector(
                       onTap: () => Get.toNamed(Routes.profile),
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
                         child: Icon(
-                          avatarsList[selectedAvatar],
+                          avatars[selectedAvatar],
                           color: const Color(0xFF5F2EEA),
                         ),
                       ),
@@ -143,7 +173,7 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
 
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
 
                 const Text(
                   "Your Tasks",
@@ -166,7 +196,7 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
 
-          // 📋 TASK LIST (UNCHANGED)
+          // 🔥 TASK LIST
           Expanded(
             child: Obx(() {
               if (controller.tasks.isEmpty) {
@@ -233,11 +263,10 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
 
-      // 🔥 FIXED BUTTON (THIS WAS BROKEN)
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF5F2EEA),
         onPressed: () => openTaskDialog(),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

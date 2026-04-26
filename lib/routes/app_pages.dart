@@ -5,6 +5,7 @@ import '../views/profile_view.dart';
 import 'app_routes.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/task_controller.dart';
+import '../controllers/avatar_controller.dart';
 
 class AppPages {
   static final initial = Routes.register;
@@ -22,6 +23,7 @@ class AppPages {
       page: () => HomeView(),
       binding: BindingsBuilder(() {
         Get.put(TaskController());
+        Get.put(AvatarController());
       }),
     ),
     GetPage(name: Routes.profile, page: () => ProfileView()),
