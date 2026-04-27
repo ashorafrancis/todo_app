@@ -9,15 +9,17 @@ class TaskController extends GetxController {
 
   @override
   void onInit() {
-    loadTasks();
     super.onInit();
+    loadTasks();
   }
 
+  // ✅ ADD TASK
   void addTask(String title, String date) {
     tasks.add(TaskModel(title: title, date: date));
     saveTasks();
   }
 
+  // ✅ EDIT TASK
   void editTask(int index, String title, String date) {
     tasks[index].title = title;
     tasks[index].date = date;
@@ -25,25 +27,27 @@ class TaskController extends GetxController {
     saveTasks();
   }
 
+  // ✅ DELETE TASK
   void deleteTask(int index) {
     tasks.removeAt(index);
     saveTasks();
   }
 
+  // ✅ TOGGLE DONE
   void toggleTask(int index) {
     tasks[index].isDone = !tasks[index].isDone;
     tasks.refresh();
     saveTasks();
   }
 
-  // 🔥 SAVE TASKS
+  // ✅ SAVE TASKS
   void saveTasks() async {
     final prefs = await SharedPreferences.getInstance();
     List<String> data = tasks.map((e) => jsonEncode(e.toJson())).toList();
     prefs.setStringList("tasks", data);
   }
 
-  // 🔥 LOAD TASKS
+  // ✅ LOAD TASKS
   void loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
     List<String>? data = prefs.getStringList("tasks");
@@ -53,7 +57,7 @@ class TaskController extends GetxController {
     }
   }
 
-  // 🔥 ADD / EDIT TASK DIALOG (UPDATED WITH DATE VALIDATION)
+  // 🔥 FULL FIXED DIALOG
   void openTaskDialog({int? index}) {
     final taskCtrl = TextEditingController();
     final dateCtrl = TextEditingController();
@@ -63,6 +67,7 @@ class TaskController extends GetxController {
       dateCtrl.text = tasks[index].date;
     }
 
+    // ✅ DATE PICKER
     Future<void> pickDate() async {
       DateTime now = DateTime.now();
       DateTime today = DateTime(now.year, now.month, now.day);
@@ -70,7 +75,7 @@ class TaskController extends GetxController {
       DateTime? picked = await showDatePicker(
         context: Get.context!,
         initialDate: today,
-        firstDate: today, // ❌ BLOCK PAST DATES
+        firstDate: today, // ❌ BLOCK PAST
         lastDate: DateTime(2100),
       );
 
@@ -79,38 +84,66 @@ class TaskController extends GetxController {
       }
     }
 
+    // ✅ DIALOG UI FIXED
     Get.defaultDialog(
       title: index == null ? "Add Task" : "Edit Task",
+      backgroundColor: Colors.white,
+      radius: 20,
+
       content: Column(
         children: [
           TextField(
             controller: taskCtrl,
-            decoration: const InputDecoration(labelText: "Task"),
+            decoration: InputDecoration(
+              labelText: "Task Title",
+              labelStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.task, color: Colors.grey),
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
+
+          const SizedBox(height: 12),
+
           TextField(
             controller: dateCtrl,
             readOnly: true,
             onTap: pickDate,
-            decoration: const InputDecoration(labelText: "Due Date"),
+            decoration: InputDecoration(
+              labelText: "Due Date",
+              labelStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.calendar_today, color: Colors.grey),
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
         ],
       ),
+
       textConfirm: "Save",
-      textCancel: "Cancel",
+      confirmTextColor: Colors.white,
+      buttonColor: const Color(0xFF6C63FF),
+
       onConfirm: () {
         if (taskCtrl.text.isEmpty || dateCtrl.text.isEmpty) {
           Get.snackbar("Error", "Fill all fields");
           return;
         }
 
-        // 🔥 STRICT VALIDATION
-        DateTime selectedDate = DateTime.parse(dateCtrl.text);
-
+        // ✅ DATE VALIDATION
+        DateTime selected = DateTime.parse(dateCtrl.text);
         DateTime now = DateTime.now();
         DateTime today = DateTime(now.year, now.month, now.day);
 
-        if (selectedDate.isBefore(today)) {
+        if (selected.isBefore(today)) {
           Get.snackbar("Error", "Cannot select past date");
           return;
         }

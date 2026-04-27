@@ -1,145 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart'; // ✅ NEW
+import 'package:intl/intl.dart';
 import '../controllers/task_controller.dart';
+import '../controllers/profile_controller.dart';
 import '../routes/app_routes.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class HomeView extends StatelessWidget {
+  final task = Get.find<TaskController>();
+  final profile = Get.find<ProfileController>();
 
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  final controller = Get.find<TaskController>();
-
-  int selectedAvatar = 0;
-
-  final List<IconData> avatars = [
-    Icons.person,
-    Icons.person_2,
-    Icons.person_3,
-    Icons.face,
-    Icons.sentiment_satisfied,
-    Icons.tag_faces,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    loadAvatar();
-  }
-
-  // 🔥 LOAD AVATAR
-  Future<void> loadAvatar() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedAvatar = prefs.getInt("avatar") ?? 0;
-    });
-  }
-
-  // 🔥 TODAY DATE
   String getTodayDate() {
     final now = DateTime.now();
     return DateFormat("EEEE, MMM d").format(now);
   }
 
-  // 🔥 ADD / EDIT TASK DIALOG
-  void openTaskDialog({int? index}) {
-    final taskCtrl = TextEditingController();
-    final dateCtrl = TextEditingController();
-
-    if (index != null) {
-      taskCtrl.text = controller.tasks[index].title;
-      dateCtrl.text = controller.tasks[index].date;
-    }
-
-    Future<void> pickDate() async {
-      DateTime now = DateTime.now();
-      DateTime today = DateTime(now.year, now.month, now.day);
-
-      DateTime? picked = await showDatePicker(
-        context: Get.context!,
-        initialDate: today,
-        firstDate: today,
-        lastDate: DateTime(2100),
-      );
-
-      if (picked != null) {
-        dateCtrl.text = picked.toString().split(" ")[0];
-      }
-    }
-
-    Get.defaultDialog(
-      title: index == null ? "Add Task" : "Edit Task",
-      content: Column(
-        children: [
-          TextField(
-            controller: taskCtrl,
-            decoration: const InputDecoration(labelText: "Task Title"),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: dateCtrl,
-            readOnly: true,
-            onTap: pickDate,
-            decoration: const InputDecoration(labelText: "Due Date"),
-          ),
-        ],
-      ),
-      textConfirm: "Save",
-      textCancel: "Cancel",
-      onConfirm: () {
-        if (taskCtrl.text.isEmpty || dateCtrl.text.isEmpty) {
-          Get.snackbar("Error", "Fill all fields");
-          return;
-        }
-
-        DateTime selectedDate = DateTime.parse(dateCtrl.text);
-        DateTime now = DateTime.now();
-        DateTime today = DateTime(now.year, now.month, now.day);
-
-        if (selectedDate.isBefore(today)) {
-          Get.snackbar("Error", "Cannot select past date");
-          return;
-        }
-
-        if (index == null) {
-          controller.addTask(taskCtrl.text, dateCtrl.text);
-        } else {
-          controller.editTask(index, taskCtrl.text, dateCtrl.text);
-        }
-
-        Get.back();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
+      backgroundColor: const Color(0xFFF5F6FA),
 
       body: Column(
         children: [
-          // 🔥 HEADER
+          // 🔥 HEADER WITH PROFILE ICON
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 45, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 25),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF5F2EEA), Color(0xFF8E2DE2)],
+                colors: [Color(0xFF6C63FF), Color(0xFF8E2DE2)],
               ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25),
-              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 🔹 TOP ROW
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -151,7 +46,7 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                         Text(
-                          getTodayDate(), // ✅ NEW DATE
+                          getTodayDate(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -160,26 +55,30 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () => Get.toNamed(Routes.profile),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          avatars[selectedAvatar],
-                          color: const Color(0xFF5F2EEA),
+
+                    // ✅ PROFILE NAVIGATION BACK
+                    Obx(
+                      () => GestureDetector(
+                        onTap: () => Get.toNamed(Routes.profile),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            profile.avatars[profile.selectedAvatar.value],
+                            color: const Color(0xFF6C63FF),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
 
                 const Text(
                   "Your Tasks",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -188,7 +87,7 @@ class _HomeViewState extends State<HomeView> {
 
                 Obx(
                   () => Text(
-                    "${controller.tasks.length} Tasks",
+                    "${task.tasks.length} Tasks",
                     style: const TextStyle(color: Colors.white70),
                   ),
                 ),
@@ -196,10 +95,10 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
 
-          // 🔥 TASK LIST
+          // 🔥 TASK LIST (FULL FEATURES RESTORED)
           Expanded(
             child: Obx(() {
-              if (controller.tasks.isEmpty) {
+              if (task.tasks.isEmpty) {
                 return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -214,15 +113,15 @@ class _HomeViewState extends State<HomeView> {
 
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: controller.tasks.length,
+                itemCount: task.tasks.length,
                 itemBuilder: (_, i) {
-                  final task = controller.tasks[i];
+                  final t = task.tasks[i];
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 14),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: task.isDone ? Colors.green[50] : Colors.white,
+                      color: t.isDone ? Colors.green[50] : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(color: Colors.black12, blurRadius: 8),
@@ -231,27 +130,48 @@ class _HomeViewState extends State<HomeView> {
                     child: Row(
                       children: [
                         Checkbox(
-                          value: task.isDone,
-                          onChanged: (_) => controller.toggleTask(i),
+                          value: t.isDone,
+                          onChanged: (_) => task.toggleTask(i),
                           activeColor: Colors.green,
                         ),
+
                         const SizedBox(width: 8),
+
+                        // 🔹 TASK DETAILS
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(task.title),
-                              Text("Due: ${task.date}"),
+                              Text(
+                                t.title,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  decoration: t.isDone
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                              ),
+                              Text(
+                                "Due: ${t.date}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ],
                           ),
                         ),
+
+                        // ✅ EDIT BUTTON BACK
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => openTaskDialog(index: i),
+                          onPressed: () => task.openTaskDialog(index: i),
                         ),
+
+                        // ✅ DELETE BUTTON BACK
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => controller.deleteTask(i),
+                          onPressed: () => task.deleteTask(i),
                         ),
                       ],
                     ),
@@ -263,9 +183,10 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
 
+      // ✅ ADD BUTTON (UNCHANGED)
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF5F2EEA),
-        onPressed: () => openTaskDialog(),
+        backgroundColor: const Color(0xFF6C63FF),
+        onPressed: () => task.openTaskDialog(),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

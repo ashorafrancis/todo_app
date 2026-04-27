@@ -1,239 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../controllers/profile_controller.dart';
 import '../controllers/auth_controller.dart';
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends StatelessWidget {
   ProfileView({super.key});
 
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  final controller = Get.find<AuthController>();
-
-  int selectedAvatar = 0;
-
-  final List<IconData> avatars = [
-    Icons.person,
-    Icons.person_2,
-    Icons.person_3,
-    Icons.face,
-    Icons.sentiment_satisfied,
-    Icons.tag_faces,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    loadAvatar();
-  }
-
-  // 🔥 LOAD AVATAR
-  Future<void> loadAvatar() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedAvatar = prefs.getInt("avatar") ?? 0;
-    });
-  }
-
-  // 🔥 SAVE AVATAR
-  Future<void> saveAvatar(int index) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt("avatar", index);
-
-    setState(() {
-      selectedAvatar = index;
-    });
-
-    Navigator.pop(context);
-  }
-
-  // 🔥 AVATAR PICKER
-  void openAvatarPicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            children: List.generate(avatars.length, (index) {
-              return GestureDetector(
-                onTap: () => saveAvatar(index),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: const Color(0xFF5F2EEA).withOpacity(0.1),
-                  child: Icon(
-                    avatars[index],
-                    size: 30,
-                    color: const Color(0xFF5F2EEA),
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
-
-  // 🔥 EDIT PROFILE
-  void editProfileDialog() {
-    final user = controller.user.value;
-
-    final nameCtrl = TextEditingController(text: user?.name ?? "");
-    final ageCtrl = TextEditingController(text: user?.age ?? "");
-    final dobCtrl = TextEditingController(text: user?.dob ?? "");
-
-    Future<void> pickDate() async {
-      DateTime? picked = await showDatePicker(
-        context: Get.context!,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1950),
-        lastDate: DateTime.now(),
-      );
-
-      if (picked != null) {
-        dobCtrl.text = picked.toString().split(" ")[0];
-      }
-    }
-
-    Get.defaultDialog(
-      title: "Edit Profile",
-      content: Column(
-        children: [
-          TextField(
-            controller: nameCtrl,
-            decoration: const InputDecoration(labelText: "Name"),
-          ),
-          TextField(
-            controller: ageCtrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: "Age"),
-          ),
-          TextField(
-            controller: dobCtrl,
-            readOnly: true,
-            onTap: pickDate,
-            decoration: const InputDecoration(labelText: "DOB"),
-          ),
-        ],
-      ),
-      textConfirm: "Save",
-      textCancel: "Cancel",
-      confirmTextColor: Colors.white,
-      buttonColor: const Color(0xFF5F2EEA),
-      onConfirm: () {
-        if (nameCtrl.text.isEmpty ||
-            ageCtrl.text.isEmpty ||
-            dobCtrl.text.isEmpty) {
-          Get.snackbar("Error", "Fill all fields");
-          return;
-        }
-
-        controller.register(nameCtrl.text, ageCtrl.text, dobCtrl.text);
-        Get.back();
-      },
-    );
-  }
+  final profileController = Get.find<ProfileController>();
+  final authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
-    final user = controller.user.value;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F3F7),
+      backgroundColor: const Color(0xFFF3F4F6),
+
       body: Stack(
         children: [
-          // 🔥 TOP GRADIENT
+          // 🔥 PURPLE TOP BACKGROUND
           Container(
             height: 220,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF5F2EEA), Color(0xFF8E2DE2)],
+                colors: [Color(0xFF6C2BD9), Color(0xFF7C3AED)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
 
-          // 🔥 CONTENT
+          // 🔥 MAIN CARD
           Column(
             children: [
-              const SizedBox(height: 140),
+              const SizedBox(height: 120),
 
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 70, 20, 20),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(30),
+                      top: Radius.circular(35),
                     ),
                   ),
+
                   child: Column(
                     children: [
-                      Text(
-                        user?.name ?? "No Name",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      // NAME
+                      Obx(() {
+                        final user = authController.user.value;
+                        return Text(
+                          user?.name ?? "No Name",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }),
+
+                      const SizedBox(height: 25),
+
+                      // INFO CARD
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAFB),
+                          borderRadius: BorderRadius.circular(18),
                         ),
+
+                        child: Obx(() {
+                          final user = authController.user.value;
+
+                          return Column(
+                            children: [
+                              _row(Icons.cake, "Age", user?.age ?? ""),
+                              const Divider(),
+                              _row(
+                                Icons.calendar_month,
+                                "DOB",
+                                user?.dob ?? "",
+                              ),
+                            ],
+                          );
+                        }),
                       ),
-
-                      const SizedBox(height: 20),
-
-                      buildRow(Icons.cake, "Age", user?.age ?? ""),
-                      const Divider(),
-                      buildRow(Icons.calendar_month, "DOB", user?.dob ?? ""),
 
                       const Spacer(),
 
-                      // ✏️ EDIT BUTTON
+                      // 🔥 BUTTONS (UNCHANGED)
                       ElevatedButton.icon(
-                        onPressed: editProfileDialog,
-                        icon: const Icon(Icons.edit, color: Colors.white),
-                        label: const Text(
-                          "Edit Profile",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5F2EEA),
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+                        onPressed: profileController.openEditProfileDialog,
+                        icon: const Icon(Icons.edit),
+                        label: const Text("Edit Profile"),
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
 
-                      // 🔥 LIGHTER LOGOUT BUTTON
                       ElevatedButton.icon(
-                        onPressed: controller.logout,
-                        icon: const Icon(Icons.logout, color: Colors.black87),
-                        label: const Text(
-                          "Logout",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade200, // ✅ lighter
-                          elevation: 0,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+                        onPressed: authController.logout,
+                        icon: const Icon(Icons.logout),
+                        label: const Text("Logout"),
                       ),
                     ],
                   ),
@@ -242,19 +108,30 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
 
-          // 🔥 AVATAR
+          // 🔥 CLEAN FLAT AVATAR (NO COLOR DIFFERENCE INSIDE)
           Positioned(
-            top: 100,
-            left: MediaQuery.of(context).size.width / 2 - 50,
-            child: GestureDetector(
-              onTap: openAvatarPicker,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.white,
-                child: Icon(
-                  avatars[selectedAvatar],
-                  size: 50,
-                  color: const Color(0xFF5F2EEA),
+            top: 80,
+            left: MediaQuery.of(context).size.width / 2 - 55,
+            child: Obx(
+              () => GestureDetector(
+                onTap: profileController.openAvatarPicker,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: CircleAvatar(
+                    radius: 55,
+                    backgroundColor: Colors.white, // 🔥 fully flat single color
+                    child: Icon(
+                      profileController.avatars[profileController
+                          .selectedAvatar
+                          .value],
+                      size: 55,
+                      color: const Color(0xFF6C2BD9),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -264,18 +141,18 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget buildRow(IconData icon, String title, String value) {
+  Widget _row(IconData icon, String title, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey),
-          const SizedBox(width: 10),
-          Text(title),
+          Icon(icon, color: const Color(0xFF6C2BD9)),
+          const SizedBox(width: 12),
+          Text(title, style: const TextStyle(fontSize: 15)),
           const Spacer(),
           Text(
             value.isEmpty ? "-" : value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           ),
         ],
       ),
