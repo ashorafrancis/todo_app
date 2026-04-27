@@ -4,9 +4,7 @@ import 'routes/app_pages.dart';
 import 'controllers/auth_controller.dart';
 
 void main() {
-  // 🔥 GLOBAL CONTROLLER (VERY IMPORTANT)
-  Get.put(AuthController(), permanent: true);
-
+  Get.put(AuthController());
   runApp(MyApp());
 }
 
@@ -16,6 +14,10 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Todo App",
+      theme: ThemeData(
+        primaryColor: const Color(0xFF6C63FF),
+        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
+      ),
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
     );

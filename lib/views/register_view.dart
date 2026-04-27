@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../ui/app_ui.dart';
 
 class RegisterView extends StatelessWidget {
   RegisterView({super.key});
 
   final nameCtrl = TextEditingController();
   final dobCtrl = TextEditingController();
-
   final controller = Get.find<AuthController>();
 
   Future<void> pickDate() async {
@@ -26,95 +26,111 @@ class RegisterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF5F2EEA), Color(0xFF8E2DE2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+      backgroundColor: AppUI.bg,
 
-            child: Container(
-              padding: const EdgeInsets.all(26),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 25,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
+      body: Column(
+        children: [
+          // ===== TOP BRAND SECTION (PRO ONBOARDING STYLE) =====
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6C5CE7), Color(0xFF8E44AD)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.task_alt, color: Colors.white, size: 60),
+
+                SizedBox(height: 10),
+
+                Text(
+                  "Welcome",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                SizedBox(height: 6),
+
+                Text(
+                  "Create your account to continue",
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ===== FORM CARD =====
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: AppUI.card,
 
               child: Column(
                 children: [
-                  const Icon(
-                    Icons.person_add,
-                    size: 65,
-                    color: Color(0xFF5F2EEA),
+                  // NAME FIELD
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: InputDecoration(
+                      labelText: "Full Name",
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 12),
 
-                  const Text(
-                    "Create Account",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  // NAME
-                  buildField("Name", nameCtrl, Icons.person),
-
-                  const SizedBox(height: 15),
-
-                  // DOB (AGE REMOVED COMPLETELY)
+                  // DOB FIELD
                   TextField(
                     controller: dobCtrl,
                     readOnly: true,
                     onTap: pickDate,
-                    style: const TextStyle(fontSize: 15),
-                    decoration: inputDecoration(
-                      "Date of Birth",
-                      Icons.calendar_today,
+                    decoration: InputDecoration(
+                      labelText: "Date of Birth",
+                      prefixIcon: const Icon(Icons.calendar_month),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 20),
 
+                  // BUTTON
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5F2EEA),
-                        elevation: 6,
-                        shadowColor: Colors.black38,
+                        backgroundColor: AppUI.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        elevation: 2,
                       ),
                       onPressed: () {
-                        if (nameCtrl.text.isEmpty || dobCtrl.text.isEmpty) {
-                          Get.snackbar("Error", "Fill all fields");
-                          return;
-                        }
-
                         controller.register(nameCtrl.text, dobCtrl.text);
                       },
                       child: const Text(
-                        "Register",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        "Create Account",
+                        style: TextStyle(fontSize: 15),
                       ),
                     ),
                   ),
@@ -122,37 +138,7 @@ class RegisterView extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildField(String label, TextEditingController ctrl, IconData icon) {
-    return TextField(
-      controller: ctrl,
-      style: const TextStyle(fontSize: 15),
-      decoration: inputDecoration(label, icon),
-    );
-  }
-
-  InputDecoration inputDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: const Color(0xFF5F2EEA)),
-      filled: true,
-      fillColor: const Color(0xFFF6F7FB),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: Colors.grey.shade200),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Color(0xFF5F2EEA), width: 1.2),
+        ],
       ),
     );
   }

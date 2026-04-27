@@ -31,7 +31,6 @@ class AvatarController extends GetxController {
     selectedAvatar.value = index;
   }
 
-  // ✅ Dialog moved here
   void openAvatarPicker() {
     Get.bottomSheet(
       Container(

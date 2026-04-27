@@ -1,191 +1,147 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../controllers/task_controller.dart';
-import '../controllers/profile_controller.dart';
 import '../routes/app_routes.dart';
+import '../ui/app_ui.dart';
 
 class HomeView extends StatelessWidget {
-  final task = Get.find<TaskController>();
-  final profile = Get.find<ProfileController>();
+  HomeView({super.key});
 
-  String getTodayDate() {
-    final now = DateTime.now();
-    return DateFormat("EEEE, MMM d").format(now);
-  }
+  final taskController = Get.find<TaskController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: AppUI.bg,
 
+      // HEADER (premium gradient)
       body: Column(
         children: [
-          // 🔥 HEADER WITH PROFILE ICON
           Container(
-  width: double.infinity,
-  padding: const EdgeInsets.fromLTRB(20, 50, 20, 25),
-  decoration: const BoxDecoration(
-    gradient: LinearGradient(
-      colors: [Color(0xFF6C63FF), Color(0xFF8E2DE2)],
-    ),
-    borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-  ),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Good Day 👋",
-                style: TextStyle(color: Colors.white70),
+            padding: const EdgeInsets.only(
+              top: 60,
+              left: 20,
+              right: 20,
+              bottom: 25,
+            ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6C5CE7), Color(0xFF8E44AD)],
               ),
-              SizedBox(height: 4),
-              Text(
-                "Your Workspace",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
-          Obx(
-            () => CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(
-                profile.avatars[profile.selectedAvatar.value],
-                color: UI.primary,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
               ),
             ),
-          ),
-        ],
-      ),
-    ],
-  ),
-)
-                    // ✅ PROFILE NAVIGATION BACK
-                    Obx(
-                      () => GestureDetector(
-                        onTap: () => Get.toNamed(Routes.profile),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            profile.avatars[profile.selectedAvatar.value],
-                            color: const Color(0xFF6C63FF),
-                          ),
-                        ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "My Tasks",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "Stay organized",
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 15),
-
-                const Text(
-                  "Your Tasks",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 5),
-
-                Obx(
-                  () => Text(
-                    "${task.tasks.length} Tasks",
-                    style: const TextStyle(color: Colors.white70),
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.person, color: Colors.white),
+                  onPressed: () => Get.toNamed(Routes.profile),
                 ),
               ],
             ),
           ),
 
-          // 🔥 TASK LIST (FULL FEATURES RESTORED)
+          const SizedBox(height: 10),
+
+          // TASK LIST
           Expanded(
             child: Obx(() {
-              if (task.tasks.isEmpty) {
-                return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.task_alt, size: 60, color: Colors.grey),
-                      SizedBox(height: 10),
-                      Text("No tasks yet"),
-                    ],
-                  ),
-                );
+              if (taskController.tasks.isEmpty) {
+                return const Center(child: Text("No tasks yet"));
               }
 
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: task.tasks.length,
-                itemBuilder: (_, i) {
-                  final t = task.tasks[i];
+                itemCount: taskController.tasks.length,
+                itemBuilder: (context, index) {
+                  final task = taskController.tasks[index];
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 14),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: t.isDone ? Colors.green[50] : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 8),
-                      ],
-                    ),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: AppUI.card,
+
                     child: Row(
                       children: [
-                        Checkbox(
-                          value: t.isDone,
-                          onChanged: (_) => task.toggleTask(i),
-                          activeColor: Colors.green,
+                        GestureDetector(
+                          onTap: () => taskController.toggleTask(index),
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: task.isDone
+                                  ? AppUI.primary
+                                  : Colors.transparent,
+                              border: Border.all(color: AppUI.primary),
+                            ),
+                            child: task.isDone
+                                ? const Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
                         ),
 
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
 
-                        // 🔹 TASK DETAILS
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                t.title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  decoration: t.isDone
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                ),
-                              ),
-                              Text(
-                                "Due: ${t.date}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                              Text(task.title, style: AppUI.title),
+
+                              const SizedBox(height: 4),
+
+                              Text(task.date, style: AppUI.subtitle),
                             ],
                           ),
                         ),
 
-                        // ✅ EDIT BUTTON BACK
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => task.openTaskDialog(index: i),
-                        ),
-
-                        // ✅ DELETE BUTTON BACK
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => task.deleteTask(i),
+                        PopupMenuButton(
+                          icon: const Icon(Icons.more_vert),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(
+                              child: const Text("Edit"),
+                              onTap: () {
+                                Future.delayed(Duration.zero, () {
+                                  taskController.openTaskDialog(index: index);
+                                });
+                              },
+                            ),
+                            PopupMenuItem(
+                              child: const Text("Delete"),
+                              onTap: () {
+                                Future.delayed(Duration.zero, () {
+                                  taskController.deleteTask(index);
+                                });
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -197,11 +153,12 @@ class HomeView extends StatelessWidget {
         ],
       ),
 
-      // ✅ ADD BUTTON (UNCHANGED)
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF6C63FF),
-        onPressed: () => task.openTaskDialog(),
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppUI.primary,
+        foregroundColor: Colors.white,
+        onPressed: () => taskController.openTaskDialog(),
+        icon: const Icon(Icons.add),
+        label: const Text("Add Task"),
       ),
     );
   }
