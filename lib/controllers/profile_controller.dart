@@ -59,7 +59,6 @@ class ProfileController extends GetxController {
     );
   }
 
-  // ✅ DATE PICKER MOVED HERE
   Future<void> pickDate(TextEditingController ctrl) async {
     DateTime? picked = await showDatePicker(
       context: Get.context!,
@@ -73,12 +72,10 @@ class ProfileController extends GetxController {
     }
   }
 
-  // ✅ EDIT PROFILE (NO LOGIC IN VIEW)
   void openEditProfileDialog() {
     final user = authController.user.value;
 
     final nameCtrl = TextEditingController(text: user?.name ?? "");
-    final ageCtrl = TextEditingController(text: user?.age ?? "");
     final dobCtrl = TextEditingController(text: user?.dob ?? "");
 
     Get.defaultDialog(
@@ -90,11 +87,6 @@ class ProfileController extends GetxController {
             decoration: const InputDecoration(labelText: "Name"),
           ),
           TextField(
-            controller: ageCtrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: "Age"),
-          ),
-          TextField(
             controller: dobCtrl,
             readOnly: true,
             onTap: () => pickDate(dobCtrl),
@@ -103,18 +95,12 @@ class ProfileController extends GetxController {
         ],
       ),
       onConfirm: () async {
-        if (nameCtrl.text.isEmpty ||
-            ageCtrl.text.isEmpty ||
-            dobCtrl.text.isEmpty) {
+        if (nameCtrl.text.isEmpty || dobCtrl.text.isEmpty) {
           Get.snackbar("Error", "Fill all fields");
           return;
         }
 
-        final updatedUser = UserModel(
-          name: nameCtrl.text,
-          age: ageCtrl.text,
-          dob: dobCtrl.text,
-        );
+        final updatedUser = UserModel(name: nameCtrl.text, dob: dobCtrl.text);
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("user", jsonEncode(updatedUser.toJson()));

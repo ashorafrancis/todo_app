@@ -20,14 +20,14 @@ class AuthController extends GetxController {
     }
   }
 
-  // ✅ VALIDATION MOVED HERE (NOT IN VIEW)
-  void register(String name, String age, String dob) async {
-    if (name.isEmpty || age.isEmpty || dob.isEmpty) {
+  // ✅ AGE REMOVED
+  void register(String name, String dob) async {
+    if (name.isEmpty || dob.isEmpty) {
       Get.snackbar("Error", "Fill all fields");
       return;
     }
 
-    final newUser = UserModel(name: name, age: age, dob: dob);
+    final newUser = UserModel(name: name, dob: dob);
     await storage.saveUser(newUser);
 
     user.value = newUser;
@@ -36,7 +36,7 @@ class AuthController extends GetxController {
   }
 
   void logout() async {
-    await storage.clear();
+    await storage.clearUser(); // ❗ ONLY USER removed, tasks kept
     user.value = null;
     Get.offAllNamed(Routes.register);
   }

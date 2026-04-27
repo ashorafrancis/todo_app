@@ -17,8 +17,9 @@ class StorageService {
     return null;
   }
 
-  Future<void> clear() async {
+  // ❗ ONLY removes user (NOT tasks)
+  Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    prefs.remove('user');
   }
 }

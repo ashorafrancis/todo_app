@@ -16,7 +16,6 @@ class ProfileView extends StatelessWidget {
 
       body: Stack(
         children: [
-          // 🔥 PURPLE TOP BACKGROUND
           Container(
             height: 220,
             decoration: const BoxDecoration(
@@ -28,7 +27,6 @@ class ProfileView extends StatelessWidget {
             ),
           ),
 
-          // 🔥 MAIN CARD
           Column(
             children: [
               const SizedBox(height: 120),
@@ -46,7 +44,6 @@ class ProfileView extends StatelessWidget {
 
                   child: Column(
                     children: [
-                      // NAME
                       Obx(() {
                         final user = authController.user.value;
                         return Text(
@@ -60,7 +57,6 @@ class ProfileView extends StatelessWidget {
 
                       const SizedBox(height: 25),
 
-                      // INFO CARD
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
@@ -73,8 +69,7 @@ class ProfileView extends StatelessWidget {
 
                           return Column(
                             children: [
-                              _row(Icons.cake, "Age", user?.age ?? ""),
-                              const Divider(),
+                              // ❌ AGE REMOVED COMPLETELY
                               _row(
                                 Icons.calendar_month,
                                 "DOB",
@@ -87,7 +82,6 @@ class ProfileView extends StatelessWidget {
 
                       const Spacer(),
 
-                      // 🔥 BUTTONS (UNCHANGED)
                       ElevatedButton.icon(
                         onPressed: profileController.openEditProfileDialog,
                         icon: const Icon(Icons.edit),
@@ -108,7 +102,6 @@ class ProfileView extends StatelessWidget {
             ],
           ),
 
-          // 🔥 CLEAN FLAT AVATAR (NO COLOR DIFFERENCE INSIDE)
           Positioned(
             top: 80,
             left: MediaQuery.of(context).size.width / 2 - 55,
@@ -123,7 +116,7 @@ class ProfileView extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 55,
-                    backgroundColor: Colors.white, // 🔥 fully flat single color
+                    backgroundColor: Colors.white,
                     child: Icon(
                       profileController.avatars[profileController
                           .selectedAvatar
@@ -148,11 +141,11 @@ class ProfileView extends StatelessWidget {
         children: [
           Icon(icon, color: const Color(0xFF6C2BD9)),
           const SizedBox(width: 12),
-          Text(title, style: const TextStyle(fontSize: 15)),
+          Text(title),
           const Spacer(),
           Text(
             value.isEmpty ? "-" : value,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ],
       ),

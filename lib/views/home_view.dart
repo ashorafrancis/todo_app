@@ -23,39 +23,53 @@ class HomeView extends StatelessWidget {
         children: [
           // 🔥 HEADER WITH PROFILE ICON
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 25),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6C63FF), Color(0xFF8E2DE2)],
+  width: double.infinity,
+  padding: const EdgeInsets.fromLTRB(20, 50, 20, 25),
+  decoration: const BoxDecoration(
+    gradient: LinearGradient(
+      colors: [Color(0xFF6C63FF), Color(0xFF8E2DE2)],
+    ),
+    borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "Good Day 👋",
+                style: TextStyle(color: Colors.white70),
               ),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 🔹 TOP ROW
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Hello 👋",
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
-                        ),
-                        Text(
-                          getTodayDate(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+              SizedBox(height: 4),
+              Text(
+                "Your Workspace",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
 
+          Obx(
+            () => CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(
+                profile.avatars[profile.selectedAvatar.value],
+                color: UI.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ],
+  ),
+)
                     // ✅ PROFILE NAVIGATION BACK
                     Obx(
                       () => GestureDetector(

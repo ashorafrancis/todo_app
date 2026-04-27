@@ -6,7 +6,6 @@ class RegisterView extends StatelessWidget {
   RegisterView({super.key});
 
   final nameCtrl = TextEditingController();
-  final ageCtrl = TextEditingController();
   final dobCtrl = TextEditingController();
 
   final controller = Get.find<AuthController>();
@@ -70,11 +69,12 @@ class RegisterView extends StatelessWidget {
 
                   const SizedBox(height: 28),
 
+                  // NAME
                   buildField("Name", nameCtrl, Icons.person),
-                  buildField("Age", ageCtrl, Icons.cake, isNumber: true),
 
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 15),
 
+                  // DOB (AGE REMOVED COMPLETELY)
                   TextField(
                     controller: dobCtrl,
                     readOnly: true,
@@ -88,7 +88,6 @@ class RegisterView extends StatelessWidget {
 
                   const SizedBox(height: 28),
 
-                  // 🔥 BUTTON IMPROVED (same logic)
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -102,18 +101,12 @@ class RegisterView extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        if (nameCtrl.text.isEmpty ||
-                            ageCtrl.text.isEmpty ||
-                            dobCtrl.text.isEmpty) {
+                        if (nameCtrl.text.isEmpty || dobCtrl.text.isEmpty) {
                           Get.snackbar("Error", "Fill all fields");
                           return;
                         }
 
-                        controller.register(
-                          nameCtrl.text,
-                          ageCtrl.text,
-                          dobCtrl.text,
-                        );
+                        controller.register(nameCtrl.text, dobCtrl.text);
                       },
                       child: const Text(
                         "Register",
@@ -134,20 +127,11 @@ class RegisterView extends StatelessWidget {
     );
   }
 
-  Widget buildField(
-    String label,
-    TextEditingController ctrl,
-    IconData icon, {
-    bool isNumber = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: TextField(
-        controller: ctrl,
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-        style: const TextStyle(fontSize: 15),
-        decoration: inputDecoration(label, icon),
-      ),
+  Widget buildField(String label, TextEditingController ctrl, IconData icon) {
+    return TextField(
+      controller: ctrl,
+      style: const TextStyle(fontSize: 15),
+      decoration: inputDecoration(label, icon),
     );
   }
 
