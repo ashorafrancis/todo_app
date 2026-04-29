@@ -10,14 +10,11 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    checkUser();
+    loadUser();
   }
 
-  void checkUser() async {
+  void loadUser() async {
     user.value = await storage.getUser();
-    if (user.value != null) {
-      Get.offAllNamed(Routes.home);
-    }
   }
 
   void register(String name, String dob) async {
@@ -50,9 +47,8 @@ class AuthController extends GetxController {
     final updatedUser = UserModel(name: name, dob: dob);
 
     await storage.saveUser(updatedUser);
-
     user.value = updatedUser;
 
-    Get.back(); // closes edit sheet ONLY
+    Get.back(); // ONLY close bottom sheet
   }
 }

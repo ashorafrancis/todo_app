@@ -19,13 +19,13 @@ class ProfileView extends StatelessWidget {
     final dobController = TextEditingController(text: user?.dob ?? "");
 
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: SingleChildScrollView(
+      SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -42,10 +42,7 @@ class ProfileView extends StatelessWidget {
 
               const Text(
                 "Edit Profile",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
@@ -55,9 +52,10 @@ class ProfileView extends StatelessWidget {
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText: "Name",
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon:
+                      const Icon(Icons.person, color: Color(0xFF2563EB)),
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: Colors.blue.shade50,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -73,9 +71,10 @@ class ProfileView extends StatelessWidget {
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: "Date of Birth",
-                  prefixIcon: const Icon(Icons.calendar_today),
+                  prefixIcon: const Icon(Icons.calendar_today,
+                      color: Color(0xFF2563EB)),
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: Colors.blue.shade50,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -107,10 +106,10 @@ class ProfileView extends StatelessWidget {
                       dobController.text,
                     );
 
-                    Get.back(); // close bottom sheet
+                    Get.back(); // ONLY close bottom sheet
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -118,10 +117,7 @@ class ProfileView extends StatelessWidget {
                   ),
                   child: const Text(
                     "Save Changes",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -190,7 +186,7 @@ class ProfileView extends StatelessWidget {
                     onTap: avatarController.openAvatarPicker,
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                      backgroundColor: const Color(0xFF2563EB),
                       child: Icon(
                         avatarController
                             .avatars[avatarController.selectedAvatar.value],
@@ -225,11 +221,11 @@ class ProfileView extends StatelessWidget {
                   onPressed: openEditProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFEFF6FF),
-                    foregroundColor:
-                        const Color(0xFF2563EB), // text + icon color
+                    foregroundColor: const Color(0xFF2563EB),
                   ),
                   child: const Text("Edit Profile"),
                 ),
+
                 const SizedBox(height: 20),
 
                 // DASHBOARD
@@ -253,8 +249,8 @@ class ProfileView extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: authController.logout,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 242, 239, 239),
-                      foregroundColor: const Color(0xFF2563EB), // text color
+                      backgroundColor: const Color.fromARGB(255, 237, 233, 233),
+                      foregroundColor: const Color(0xFF2563EB),
                     ),
                     child: const Text("Logout"),
                   ),
@@ -272,7 +268,7 @@ class ProfileView extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          Icon(icon, color: const Color.fromARGB(255, 40, 13, 178)),
+          Icon(icon, color: const Color(0xFF2563EB)),
           const SizedBox(height: 5),
           Text(label),
         ],

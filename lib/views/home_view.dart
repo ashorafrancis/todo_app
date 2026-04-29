@@ -18,6 +18,23 @@ class HomeView extends StatelessWidget {
     return "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
   }
 
+  Widget buildTask(dynamic t) {
+    return TaskTile(
+      t.title,
+      [t.category],
+      isDone: t.isDone,
+      onTap: () {
+        controller.toggleTask(t.id);
+      },
+      onEdit: () {
+        controller.openEditTask(t);
+      },
+      onDelete: () {
+        controller.deleteTask(t.id);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -70,52 +87,34 @@ class HomeView extends StatelessWidget {
             final tomorrow = today.add(const Duration(days: 1));
 
             final todayTasks = controller.getTasksForDate(formatDate(today));
+
             final tomorrowTasks =
                 controller.getTasksForDate(formatDate(tomorrow));
+
             final allTasks = controller.tasks;
 
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // TODAY
                 if (todayTasks.isNotEmpty) ...[
                   const SectionTitle("Today"),
-                  ...todayTasks.map((t) {
-                    return GestureDetector(
-                      onTap: () => controller.toggleTask(t.id),
-                      child: TaskTile(
-                        t.title,
-                        [t.category],
-                        isDone: t.isDone,
-                      ),
-                    );
-                  }).toList(),
+                  ...todayTasks.map(buildTask),
                 ],
+
                 const SizedBox(height: 10),
+
+                // TOMORROW
                 if (tomorrowTasks.isNotEmpty) ...[
                   const SectionTitle("Tomorrow"),
-                  ...tomorrowTasks.map((t) {
-                    return GestureDetector(
-                      onTap: () => controller.toggleTask(t.id),
-                      child: TaskTile(
-                        t.title,
-                        [t.category],
-                        isDone: t.isDone,
-                      ),
-                    );
-                  }).toList(),
+                  ...tomorrowTasks.map(buildTask),
                 ],
+
                 const SizedBox(height: 10),
+
+                // ALL TASKS
                 const SectionTitle("All Tasks"),
-                ...allTasks.map((t) {
-                  return GestureDetector(
-                    onTap: () => controller.toggleTask(t.id),
-                    child: TaskTile(
-                      t.title,
-                      [t.category],
-                      isDone: t.isDone,
-                    ),
-                  );
-                }).toList(),
+                ...allTasks.map(buildTask),
               ],
             );
           }),
