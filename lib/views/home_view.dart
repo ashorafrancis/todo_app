@@ -3,17 +3,16 @@ import 'package:get/get.dart';
 
 import '../controllers/task_controller.dart';
 import '../controllers/avatar_controller.dart';
-
 import '../widgets/task_tile.dart';
 import '../widgets/section_title.dart';
 import '../core/theme.dart';
-import '../routes/app_routes.dart';
+import '../views/profile_view.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
-  final controller = Get.find<TaskController>();
-  final avatarController = Get.find<AvatarController>();
+  final TaskController controller = Get.find<TaskController>();
+  final AvatarController avatarController = Get.find<AvatarController>();
 
   String formatDate(DateTime d) {
     return "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
@@ -25,30 +24,34 @@ class HomeView extends StatelessWidget {
       children: [
         // HEADER
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 60, 20, 25),
           decoration: const BoxDecoration(
             gradient: AppTheme.gradient,
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
                 "My Tasks",
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-
-              // ✅ FIXED NAVIGATION TO PROFILE
               GestureDetector(
-                onTap: () {
-                  Get.toNamed(Routes.profile);
-                },
+                onTap: () => Get.to(() => ProfileView()),
                 child: Obx(() {
+                  final index = avatarController.selectedAvatar.value;
+
                   return CircleAvatar(
                     backgroundColor: Colors.white24,
                     child: Icon(
-                      avatarController
-                          .avatars[avatarController.selectedAvatar.value],
+                      avatarController.avatars[
+                          index.clamp(0, avatarController.avatars.length - 1)],
                       color: Colors.white,
                     ),
                   );
@@ -58,7 +61,9 @@ class HomeView extends StatelessWidget {
           ),
         ),
 
-        // TASK LIST
+        const SizedBox(height: 10),
+
+        // BODY
         Expanded(
           child: Obx(() {
             final today = DateTime.now();
@@ -67,34 +72,41 @@ class HomeView extends StatelessWidget {
             final todayTasks = controller.getTasksForDate(formatDate(today));
             final tomorrowTasks =
                 controller.getTasksForDate(formatDate(tomorrow));
+            final allTasks = controller.tasks;
 
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const SectionTitle("Today"),
-                ...todayTasks.map((t) {
-                  return GestureDetector(
-                    onTap: () => controller.toggleTask(t.id),
-                    child: TaskTile(
-                      t.title,
-                      [t.category],
-                      isDone: t.isDone,
-                    ),
-                  );
-                }),
-                const SectionTitle("Tomorrow"),
-                ...tomorrowTasks.map((t) {
-                  return GestureDetector(
-                    onTap: () => controller.toggleTask(t.id),
-                    child: TaskTile(
-                      t.title,
-                      [t.category],
-                      isDone: t.isDone,
-                    ),
-                  );
-                }),
+                if (todayTasks.isNotEmpty) ...[
+                  const SectionTitle("Today"),
+                  ...todayTasks.map((t) {
+                    return GestureDetector(
+                      onTap: () => controller.toggleTask(t.id),
+                      child: TaskTile(
+                        t.title,
+                        [t.category],
+                        isDone: t.isDone,
+                      ),
+                    );
+                  }).toList(),
+                ],
+                const SizedBox(height: 10),
+                if (tomorrowTasks.isNotEmpty) ...[
+                  const SectionTitle("Tomorrow"),
+                  ...tomorrowTasks.map((t) {
+                    return GestureDetector(
+                      onTap: () => controller.toggleTask(t.id),
+                      child: TaskTile(
+                        t.title,
+                        [t.category],
+                        isDone: t.isDone,
+                      ),
+                    );
+                  }).toList(),
+                ],
+                const SizedBox(height: 10),
                 const SectionTitle("All Tasks"),
-                ...controller.tasks.map((t) {
+                ...allTasks.map((t) {
                   return GestureDetector(
                     onTap: () => controller.toggleTask(t.id),
                     child: TaskTile(
@@ -103,7 +115,7 @@ class HomeView extends StatelessWidget {
                       isDone: t.isDone,
                     ),
                   );
-                }),
+                }).toList(),
               ],
             );
           }),

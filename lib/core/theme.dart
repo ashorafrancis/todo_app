@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const primary = Color(0xFF7B61FF);
-  static const secondary = Color(0xFFFF6FD8);
-  static const bg = Color(0xFFF4F5F7);
+  static const primary = Color(0xFF2563EB); // blue
+  static const secondary = Color(0xFF60A5FA); // light blue
+  static const bg = Color(0xFFF4F8FF);
 
   static const gradient = LinearGradient(
     colors: [primary, secondary],

@@ -22,7 +22,16 @@ class AvatarController extends GetxController {
 
   void loadAvatar() async {
     final prefs = await SharedPreferences.getInstance();
-    selectedAvatar.value = prefs.getInt("avatar") ?? 0;
+
+    final index = prefs.getInt("avatar");
+
+    if (index == null) {
+      selectedAvatar.value = 0;
+    } else if (index >= 0 && index < avatars.length) {
+      selectedAvatar.value = index;
+    } else {
+      selectedAvatar.value = 0;
+    }
   }
 
   void setAvatar(int index) async {

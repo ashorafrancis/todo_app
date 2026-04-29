@@ -18,7 +18,10 @@ class RegisterView extends StatelessWidget {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF8E2DE2), Color(0xFFFF6FD8)],
+            colors: [
+              Color.fromARGB(255, 37, 99, 235),
+              Color.fromARGB(255, 96, 165, 250)
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -41,8 +44,32 @@ class RegisterView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.person, color: Colors.white, size: 40),
-
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 37, 99, 235),
+                        Color.fromARGB(255, 96, 165, 250)
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2563EB).withOpacity(0.3),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 40,
+                    color: Colors.white,
+                  ),
+                ),
                 const SizedBox(height: 15),
 
                 const Text(
@@ -104,7 +131,10 @@ class RegisterView extends StatelessWidget {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFFF6FD8), Color(0xFF8E2DE2)],
+                      colors: [
+                        Color.fromARGB(255, 37, 99, 235),
+                        Color.fromARGB(255, 96, 165, 250)
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(15),
                   ),

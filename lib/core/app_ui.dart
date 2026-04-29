@@ -4,16 +4,16 @@ class AppUI {
   // COLORS (refined modern palette)
   static const bg = Color(0xFFF8F9FD);
   static const surface = Colors.white;
-  static const primary = Color(0xFF7C3AED);
-  static const primaryLight = Color(0xFFEDE9FE);
-  static const accent = Color(0xFF10B981);
+  static const primary = Color(0xFF2563EB);
+  static const primaryLight = Color(0xFFDBEAFE);
+  static const accent = Color(0xFF22C55E); // green stays ok
   static const danger = Color(0xFFEF4444);
   static const textDark = Color(0xFF1F2937);
   static const textMuted = Color(0xFF6B7280);
 
   // GRADIENTS
   static const headerGradient = LinearGradient(
-    colors: [Color(0xFF7C3AED), Color(0xFF9333EA), Color(0xFFC026D3)],
+    colors: [Color(0xFF2563EB), Color(0xFF3B82F6), Color(0xFF60A5FA)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -51,7 +51,7 @@ class AppUI {
   );
 
   // CARD STYLE
-  static BoxDecoration card = BoxDecoration(
+  static BoxDecoration cardDecoration = BoxDecoration(
     color: surface,
     borderRadius: BorderRadius.circular(20),
     boxShadow: [

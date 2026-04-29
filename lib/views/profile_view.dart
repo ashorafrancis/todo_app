@@ -25,98 +25,108 @@ class ProfileView extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 50,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Edit Profile",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // NAME
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: "Name",
-                prefixIcon: const Icon(Icons.person),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 15),
+              const SizedBox(height: 20),
 
-            // DOB
-            TextField(
-              controller: dobController,
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: "Date of Birth",
-                prefixIcon: const Icon(Icons.calendar_today),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
+              const Text(
+                "Edit Profile",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: () async {
-                DateTime? picked = await showDatePicker(
-                  context: Get.context!,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1950),
-                  lastDate: DateTime.now(),
-                );
 
-                if (picked != null) {
-                  dobController.text = picked.toString().split(" ")[0];
-                }
-              },
-            ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            // SAVE BUTTON
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  authController.updateUser(
-                    nameController.text,
-                    dobController.text,
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
+              // NAME
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  prefixIcon: const Icon(Icons.person),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                child: const Text("Save Changes"),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 15),
+
+              // DOB
+              TextField(
+                controller: dobController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: "Date of Birth",
+                  prefixIcon: const Icon(Icons.calendar_today),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onTap: () async {
+                  DateTime? picked = await showDatePicker(
+                    context: Get.context!,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1950),
+                    lastDate: DateTime.now(),
+                  );
+
+                  if (picked != null) {
+                    dobController.text = picked.toString().split(" ")[0];
+                  }
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // SAVE BUTTON
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    authController.updateUser(
+                      nameController.text,
+                      dobController.text,
+                    );
+
+                    Get.back(); // close bottom sheet
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "Save Changes",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -124,7 +134,7 @@ class ProfileView extends StatelessWidget {
 
   void openPage(String type) {
     if (type == "tasks") {
-      Get.back(); // go back to home (tasks screen)
+      Get.back();
     } else if (type == "schedule") {
       Get.toNamed(Routes.calendar);
     }
@@ -177,12 +187,10 @@ class ProfileView extends StatelessWidget {
                 // AVATAR
                 Obx(() {
                   return GestureDetector(
-                    onTap: () {
-                      avatarController.openAvatarPicker();
-                    },
+                    onTap: avatarController.openAvatarPicker,
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: const Color.fromARGB(255, 37, 99, 235),
                       child: Icon(
                         avatarController
                             .avatars[avatarController.selectedAvatar.value],
@@ -215,9 +223,13 @@ class ProfileView extends StatelessWidget {
                 // EDIT BUTTON
                 ElevatedButton(
                   onPressed: openEditProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFEFF6FF),
+                    foregroundColor:
+                        const Color(0xFF2563EB), // text + icon color
+                  ),
                   child: const Text("Edit Profile"),
                 ),
-
                 const SizedBox(height: 20),
 
                 // DASHBOARD
@@ -239,10 +251,11 @@ class ProfileView extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      authController.logout();
-                    },
-                    style: ElevatedButton.styleFrom(),
+                    onPressed: authController.logout,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 242, 239, 239),
+                      foregroundColor: const Color(0xFF2563EB), // text color
+                    ),
                     child: const Text("Logout"),
                   ),
                 ),
@@ -259,7 +272,7 @@ class ProfileView extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          Icon(icon, color: Colors.deepPurple),
+          Icon(icon, color: const Color.fromARGB(255, 40, 13, 178)),
           const SizedBox(height: 5),
           Text(label),
         ],

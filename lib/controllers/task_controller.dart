@@ -28,4 +28,18 @@ class TaskController extends GetxController {
   List<TaskModel> getTasksForDate(String date) {
     return tasks.where((t) => t.date == date).toList();
   }
+
+  void deleteTask(String id) {
+    tasks.removeWhere((t) => t.id == id);
+  }
+
+  void updateTask(String id, String newTitle, String newCategory) {
+    final index = tasks.indexWhere((t) => t.id == id);
+
+    if (index != -1) {
+      tasks[index].title = newTitle;
+      tasks[index].category = newCategory;
+      tasks.refresh();
+    }
+  }
 }
