@@ -1,165 +1,114 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../controllers/task_controller.dart';
+import '../controllers/avatar_controller.dart';
+
+import '../widgets/task_tile.dart';
+import '../widgets/section_title.dart';
+import '../core/theme.dart';
 import '../routes/app_routes.dart';
-import '../ui/app_ui.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
-  final taskController = Get.find<TaskController>();
+  final controller = Get.find<TaskController>();
+  final avatarController = Get.find<AvatarController>();
+
+  String formatDate(DateTime d) {
+    return "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppUI.bg,
-
-      // HEADER (premium gradient)
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(
-              top: 60,
-              left: 20,
-              right: 20,
-              bottom: 25,
-            ),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6C5CE7), Color(0xFF8E44AD)],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(28),
-                bottomRight: Radius.circular(28),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "My Tasks",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Stay organized",
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                  ],
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.person, color: Colors.white),
-                  onPressed: () => Get.toNamed(Routes.profile),
-                ),
-              ],
-            ),
+    return Column(
+      children: [
+        // HEADER
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+          decoration: const BoxDecoration(
+            gradient: AppTheme.gradient,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
           ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "My Tasks",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
 
-          const SizedBox(height: 10),
-
-          // TASK LIST
-          Expanded(
-            child: Obx(() {
-              if (taskController.tasks.isEmpty) {
-                return const Center(child: Text("No tasks yet"));
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: taskController.tasks.length,
-                itemBuilder: (context, index) {
-                  final task = taskController.tasks[index];
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(14),
-                    decoration: AppUI.card,
-
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => taskController.toggleTask(index),
-                          child: Container(
-                            width: 26,
-                            height: 26,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: task.isDone
-                                  ? AppUI.primary
-                                  : Colors.transparent,
-                              border: Border.all(color: AppUI.primary),
-                            ),
-                            child: task.isDone
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 16,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(task.title, style: AppUI.title),
-
-                              const SizedBox(height: 4),
-
-                              Text(task.date, style: AppUI.subtitle),
-                            ],
-                          ),
-                        ),
-
-                        PopupMenuButton(
-                          icon: const Icon(Icons.more_vert),
-                          itemBuilder: (_) => [
-                            PopupMenuItem(
-                              child: const Text("Edit"),
-                              onTap: () {
-                                Future.delayed(Duration.zero, () {
-                                  taskController.openTaskDialog(index: index);
-                                });
-                              },
-                            ),
-                            PopupMenuItem(
-                              child: const Text("Delete"),
-                              onTap: () {
-                                Future.delayed(Duration.zero, () {
-                                  taskController.deleteTask(index);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+              // ✅ FIXED NAVIGATION TO PROFILE
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed(Routes.profile);
+                },
+                child: Obx(() {
+                  return CircleAvatar(
+                    backgroundColor: Colors.white24,
+                    child: Icon(
+                      avatarController
+                          .avatars[avatarController.selectedAvatar.value],
+                      color: Colors.white,
                     ),
                   );
-                },
-              );
-            }),
+                }),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppUI.primary,
-        foregroundColor: Colors.white,
-        onPressed: () => taskController.openTaskDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text("Add Task"),
-      ),
+        // TASK LIST
+        Expanded(
+          child: Obx(() {
+            final today = DateTime.now();
+            final tomorrow = today.add(const Duration(days: 1));
+
+            final todayTasks = controller.getTasksForDate(formatDate(today));
+            final tomorrowTasks =
+                controller.getTasksForDate(formatDate(tomorrow));
+
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const SectionTitle("Today"),
+                ...todayTasks.map((t) {
+                  return GestureDetector(
+                    onTap: () => controller.toggleTask(t.id),
+                    child: TaskTile(
+                      t.title,
+                      [t.category],
+                      isDone: t.isDone,
+                    ),
+                  );
+                }),
+                const SectionTitle("Tomorrow"),
+                ...tomorrowTasks.map((t) {
+                  return GestureDetector(
+                    onTap: () => controller.toggleTask(t.id),
+                    child: TaskTile(
+                      t.title,
+                      [t.category],
+                      isDone: t.isDone,
+                    ),
+                  );
+                }),
+                const SectionTitle("All Tasks"),
+                ...controller.tasks.map((t) {
+                  return GestureDetector(
+                    onTap: () => controller.toggleTask(t.id),
+                    child: TaskTile(
+                      t.title,
+                      [t.category],
+                      isDone: t.isDone,
+                    ),
+                  );
+                }),
+              ],
+            );
+          }),
+        ),
+      ],
     );
   }
 }

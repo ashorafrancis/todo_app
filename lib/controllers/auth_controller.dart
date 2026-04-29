@@ -20,7 +20,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // ✅ AGE REMOVED
   void register(String name, String dob) async {
     if (name.isEmpty || dob.isEmpty) {
       Get.snackbar("Error", "Fill all fields");
@@ -36,8 +35,24 @@ class AuthController extends GetxController {
   }
 
   void logout() async {
-    await storage.clearUser(); // ❗ ONLY USER removed, tasks kept
+    await storage.clearUser();
     user.value = null;
+
     Get.offAllNamed(Routes.register);
+  }
+
+  void updateUser(String name, String dob) async {
+    if (name.isEmpty || dob.isEmpty) {
+      Get.snackbar("Error", "Fill all fields");
+      return;
+    }
+
+    final updatedUser = UserModel(name: name, dob: dob);
+
+    await storage.saveUser(updatedUser);
+
+    user.value = updatedUser;
+
+    Get.back(); // closes edit sheet ONLY
   }
 }

@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'routes/app_pages.dart';
+
+import 'controllers/task_controller.dart';
 import 'controllers/auth_controller.dart';
+import 'controllers/profile_controller.dart';
+import 'controllers/avatar_controller.dart';
+
+import 'routes/app_pages.dart';
 
 void main() {
-  Get.put(AuthController());
-  runApp(MyApp());
+  Get.put(TaskController(), permanent: true);
+  Get.put(AuthController(), permanent: true);
+  Get.put(ProfileController(), permanent: true);
+  Get.put(AvatarController(), permanent: true);
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Todo App",
-      theme: ThemeData(
-        primaryColor: const Color(0xFF6C63FF),
-        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
-      ),
+
+      // ✅ FIX ROUTING SYSTEM
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
     );

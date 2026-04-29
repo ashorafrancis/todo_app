@@ -1,5 +1,6 @@
-abstract class Routes {
-  static const register = '/register';
+class Routes {
   static const home = '/home';
   static const profile = '/profile';
+  static const register = '/register';
+  static const calendar = '/calendar';
 }

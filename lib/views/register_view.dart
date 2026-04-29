@@ -1,144 +1,132 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../controllers/auth_controller.dart';
-import '../ui/app_ui.dart';
 
 class RegisterView extends StatelessWidget {
-  RegisterView({super.key});
-
-  final nameCtrl = TextEditingController();
-  final dobCtrl = TextEditingController();
-  final controller = Get.find<AuthController>();
-
-  Future<void> pickDate() async {
-    DateTime? picked = await showDatePicker(
-      context: Get.context!,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
-    );
-
-    if (picked != null) {
-      dobCtrl.text = picked.toString().split(" ")[0];
-    }
-  }
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
+
+    final nameController = TextEditingController();
+    final dobController = TextEditingController();
+
     return Scaffold(
-      backgroundColor: AppUI.bg,
-
-      body: Column(
-        children: [
-          // ===== TOP BRAND SECTION (PRO ONBOARDING STYLE) =====
-          Container(
-            height: 240,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6C5CE7), Color(0xFF8E44AD)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF8E2DE2), Color(0xFFFF6FD8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
+              ],
             ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.task_alt, color: Colors.white, size: 60),
+                const Icon(Icons.person, color: Colors.white, size: 40),
 
-                SizedBox(height: 10),
+                const SizedBox(height: 15),
 
-                Text(
-                  "Welcome",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                const Text(
+                  "Register",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 25),
+
+                // NAME
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.person_outline),
+                    hintText: "Enter your name",
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
 
-                SizedBox(height: 6),
+                const SizedBox(height: 15),
 
-                Text(
-                  "Create your account to continue",
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                // DOB
+                TextField(
+                  controller: dobController,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.calendar_today),
+                    hintText: "Date of Birth",
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  onTap: () async {
+                    DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime(2000),
+                      firstDate: DateTime(1950),
+                      lastDate: DateTime.now(),
+                    );
+
+                    if (picked != null) {
+                      dobController.text = picked.toString().split(" ")[0];
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 25),
+
+                // SIGN UP BUTTON (FIXED NAV)
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF6FD8), Color(0xFF8E2DE2)],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      authController.register(
+                        nameController.text,
+                        dobController.text,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    child: const Text("Register"),
+                  ),
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          // ===== FORM CARD =====
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: AppUI.card,
-
-              child: Column(
-                children: [
-                  // NAME FIELD
-                  TextField(
-                    controller: nameCtrl,
-                    decoration: InputDecoration(
-                      labelText: "Full Name",
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // DOB FIELD
-                  TextField(
-                    controller: dobCtrl,
-                    readOnly: true,
-                    onTap: pickDate,
-                    decoration: InputDecoration(
-                      labelText: "Date of Birth",
-                      prefixIcon: const Icon(Icons.calendar_month),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppUI.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 2,
-                      ),
-                      onPressed: () {
-                        controller.register(nameCtrl.text, dobCtrl.text);
-                      },
-                      child: const Text(
-                        "Create Account",
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
