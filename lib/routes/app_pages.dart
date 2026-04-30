@@ -7,7 +7,7 @@ import '../routes/app_routes.dart';
 import '../screens/calendar_view.dart';
 
 class AppPages {
-  static final initial = Routes.register;
+  static final initial = Routes.home;
 
   static final routes = [
     GetPage(

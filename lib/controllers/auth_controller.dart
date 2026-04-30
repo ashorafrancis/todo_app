@@ -15,6 +15,16 @@ class AuthController extends GetxController {
 
   void loadUser() async {
     user.value = await storage.getUser();
+    void loadUser() async {
+      user.value = await storage.getUser();
+
+      // ✅ AUTO ROUTING CONTROL
+      if (user.value == null) {
+        Get.offAllNamed(Routes.register);
+      } else {
+        Get.offAllNamed(Routes.home);
+      }
+    }
   }
 
   void register(String name, String dob) async {

@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 
 import '../controllers/task_controller.dart';
 import '../controllers/avatar_controller.dart';
-import '../widgets/task_tile.dart';
-import '../widgets/section_title.dart';
 import '../core/theme.dart';
 import '../views/profile_view.dart';
 
@@ -18,28 +16,11 @@ class HomeView extends StatelessWidget {
     return "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
   }
 
-  Widget buildTask(dynamic t) {
-    return TaskTile(
-      t.title,
-      [t.category],
-      isDone: t.isDone,
-      onTap: () {
-        controller.toggleTask(t.id);
-      },
-      onEdit: () {
-        controller.openEditTask(t);
-      },
-      onDelete: () {
-        controller.deleteTask(t.id);
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // HEADER
+        // HEADER (UNCHANGED)
         Container(
           padding: const EdgeInsets.fromLTRB(20, 60, 20, 25),
           decoration: const BoxDecoration(
@@ -80,41 +61,90 @@ class HomeView extends StatelessWidget {
 
         const SizedBox(height: 10),
 
-        // BODY
+        // BODY (ONLY ALL TASKS)
         Expanded(
           child: Obx(() {
-            final today = DateTime.now();
-            final tomorrow = today.add(const Duration(days: 1));
-
-            final todayTasks = controller.getTasksForDate(formatDate(today));
-
-            final tomorrowTasks =
-                controller.getTasksForDate(formatDate(tomorrow));
-
             final allTasks = controller.tasks;
+
+            // completed tasks go bottom
+            final sortedTasks = [...allTasks];
+            sortedTasks.sort((a, b) {
+              if (a.isDone == b.isDone) return 0;
+              return a.isDone ? 1 : -1;
+            });
 
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // TODAY
-                if (todayTasks.isNotEmpty) ...[
-                  const SectionTitle("Today"),
-                  ...todayTasks.map(buildTask),
-                ],
-
+                const Text(
+                  "All Tasks",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 10),
+                ...sortedTasks.map((t) {
+                  return ListTile(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
 
-                // TOMORROW
-                if (tomorrowTasks.isNotEmpty) ...[
-                  const SectionTitle("Tomorrow"),
-                  ...tomorrowTasks.map(buildTask),
-                ],
+                    title: Text(
+                      t.title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        decoration: t.isDone
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        color: t.isDone ? Colors.grey : Colors.black,
+                      ),
+                    ),
 
-                const SizedBox(height: 10),
+                    subtitle: Text(
+                      t.category,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: t.isDone ? Colors.grey.shade400 : Colors.grey,
+                      ),
+                    ),
 
-                // ALL TASKS
-                const SectionTitle("All Tasks"),
-                ...allTasks.map(buildTask),
+                    onTap: () => controller.toggleTask(t.id),
+
+                    // ✅ 3 DOT MENU (REPLACED EDIT/DELETE)
+                    trailing: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, size: 18),
+                      onSelected: (value) {
+                        if (value == "edit") {
+                          controller.openEditTask(t);
+                        } else if (value == "delete") {
+                          controller.deleteTask(t.id);
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: "edit",
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 18, color: Colors.blue),
+                              SizedBox(width: 8),
+                              Text("Edit"),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: "delete",
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, size: 18, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text("Delete"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ],
             );
           }),

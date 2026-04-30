@@ -24,8 +24,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-
-      // ✅ FIX ROUTING SYSTEM
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
     );
