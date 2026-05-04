@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_ui.dart';
+import '../core/theme.dart';
 
 class TaskTile extends StatelessWidget {
   final String title;
@@ -33,7 +34,7 @@ class TaskTile extends StatelessWidget {
             onTap: onTap,
             child: Icon(
               isDone ? Icons.check_circle : Icons.circle_outlined,
-              color: isDone ? AppUI.accent : Colors.grey,
+              color: isDone ? AppTheme.success : Colors.grey,
             ),
           ),
 
@@ -64,14 +65,14 @@ class TaskTile extends StatelessWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppUI.primary.withOpacity(0.08),
+                            color: AppTheme.primary.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             t,
                             style: const TextStyle(
                               fontSize: 11,
-                              color: AppUI.primary,
+                              color: AppTheme.primary,
                             ),
                           ),
                         ),

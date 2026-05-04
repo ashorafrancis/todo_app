@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/theme.dart';
 import '../views/home_view.dart';
-import '../screens/calendar_view.dart';
+import '../views/calendar_view.dart';
 import '../widgets/add_task_sheet.dart';
 
 class MainScreen extends StatefulWidget {
