@@ -2,38 +2,66 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:todo_app/widgets/custom_date_picker.dart';
 import '../models/task_model.dart';
 
 class TaskController extends GetxController {
   var tasks = <TaskModel>[].obs;
 
+  // ✅ ADDED: current user
+  String currentUser = "";
+
   @override
   void onInit() {
     super.onInit();
+  }
+
+  // =========================
+  // ✅ SET USER (CALL AFTER LOGIN)
+  // =========================
+  void setUser(String username) {
+    currentUser = username;
     loadTasks();
   }
 
   // =========================
-  // LOAD TASKS
+  // ✅ LOGOUT (ADDED)
+  // =========================
+  void logout() {
+    currentUser = "";
+    tasks.clear(); // clear UI only (NOT storage)
+  }
+
+  // =========================
+  // LOAD TASKS (UPDATED)
   // =========================
   void loadTasks() async {
+    if (currentUser.isEmpty) return;
+
     final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString("tasks");
+    final data = prefs.getString("tasks_$currentUser");
 
     if (data != null) {
       final List decoded = jsonDecode(data);
-      tasks.value = decoded.map((e) => TaskModel.fromJson(e)).toList();
+
+      tasks.clear();
+      tasks.addAll(
+        decoded.map((e) => TaskModel.fromJson(e)).toList(),
+      );
+    } else {
+      tasks.clear(); // new user → empty
     }
   }
 
   // =========================
-  // SAVE TASKS
+  // SAVE TASKS (UPDATED)
   // =========================
   void saveTasks() async {
+    if (currentUser.isEmpty) return;
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-      "tasks",
+      "tasks_$currentUser",
       jsonEncode(tasks.map((e) => e.toJson()).toList()),
     );
   }
@@ -76,7 +104,7 @@ class TaskController extends GetxController {
   }
 
   // =========================
-  // UPDATE TASK (FIXED)
+  // UPDATE TASK
   // =========================
   void updateTask(
     String id,
@@ -104,7 +132,7 @@ class TaskController extends GetxController {
   }
 
   // =========================
-  // OPEN EDIT TASK (FIXED UI)
+  // OPEN EDIT TASK
   // =========================
   void openEditTask(TaskModel task) {
     final titleController = TextEditingController(text: task.title);
@@ -155,18 +183,17 @@ class TaskController extends GetxController {
                 Text("Date: $selectedDate"),
                 ElevatedButton(
                   onPressed: () async {
-                    DateTime? picked = await showDatePicker(
-                      context: Get.context!,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
+                    DateTime? picked = await customDatePicker(
+                      Get.context!,
+                      DateTime.now(),
+                      disablePast: true,
                     );
 
                     if (picked != null) {
                       selectedDate =
                           "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
 
-                      update(); // refresh UI
+                      update();
                     }
                   },
                   child: const Text("Change Date"),

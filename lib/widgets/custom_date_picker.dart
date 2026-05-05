@@ -4,8 +4,10 @@ import '../core/theme.dart';
 
 Future<DateTime?> customDatePicker(
   BuildContext context,
-  DateTime initialDate,
-) {
+  DateTime initialDate, {
+  bool disablePast = false,
+  bool disableFuture = false,
+}) {
   DateTime selectedDate = initialDate;
   DateTime focusedDay = initialDate;
 
@@ -36,27 +38,47 @@ Future<DateTime?> customDatePicker(
                 ),
                 const Text(
                   "Select Date",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 TableCalendar(
-                  firstDay: DateTime(2000),
+                  firstDay: DateTime(1900),
                   lastDay: DateTime(2100),
                   focusedDay: focusedDay,
+
+                  // ✅ SWITCH BETWEEN MODES
+                  enabledDayPredicate: (day) {
+                    final today = DateTime.now();
+
+                    final cleanToday =
+                        DateTime(today.year, today.month, today.day);
+                    final cleanDay = DateTime(day.year, day.month, day.day);
+
+                    if (disablePast) {
+                      return !cleanDay.isBefore(cleanToday); // ✅ FIXED
+                    }
+
+                    if (disableFuture) {
+                      return !cleanDay.isAfter(cleanToday); // ✅ FIXED
+                    }
+
+                    return true;
+                  },
+
                   selectedDayPredicate: (day) => isSameDay(selectedDate, day),
+
                   onDaySelected: (selected, focused) {
                     setState(() {
                       selectedDate = selected;
                       focusedDay = focused;
                     });
                   },
+
                   headerStyle: const HeaderStyle(
                     titleCentered: true,
                     formatButtonVisible: false,
                   ),
+
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
                       color: AppTheme.primary.withOpacity(0.3),

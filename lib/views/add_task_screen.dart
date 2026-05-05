@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/task_controller.dart';
 import '../core/theme.dart';
+import 'package:todo_app/widgets/custom_date_picker.dart';
 
 class AddTaskSheet extends StatefulWidget {
   const AddTaskSheet({super.key});
@@ -99,11 +100,10 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 leading: const Icon(Icons.calendar_today),
                 title: Text(formatDate(selectedDate)),
                 onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
+                  final picked = await customDatePicker(
+                    context,
+                    selectedDate,
+                    disablePast: true, // 🔥 THIS is what disables old dates
                   );
 
                   if (picked != null) {

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../models/user_model.dart';
 import '../services/storage_service.dart';
 import '../routes/app_routes.dart';
+import 'package:todo_app/controllers/task_controller.dart';
 
 class AuthController extends GetxController {
   final storage = StorageService();
@@ -15,15 +16,14 @@ class AuthController extends GetxController {
 
   void loadUser() async {
     user.value = await storage.getUser();
-    void loadUser() async {
-      user.value = await storage.getUser();
 
-      // ✅ AUTO ROUTING CONTROL
-      if (user.value == null) {
-        Get.offAllNamed(Routes.register);
-      } else {
-        Get.offAllNamed(Routes.home);
-      }
+    if (user.value == null) {
+      Get.offAllNamed(Routes.register);
+    } else {
+      // ✅ ADD THIS LINE
+      Get.find<TaskController>().setUser(user.value!.name);
+
+      Get.offAllNamed(Routes.home);
     }
   }
 
@@ -37,12 +37,14 @@ class AuthController extends GetxController {
     await storage.saveUser(newUser);
 
     user.value = newUser;
+    Get.find<TaskController>().setUser(name);
 
     Get.offAllNamed(Routes.home);
   }
 
   void logout() async {
     await storage.clearUser();
+    Get.find<TaskController>().logout();
     user.value = null;
 
     Get.offAllNamed(Routes.register);

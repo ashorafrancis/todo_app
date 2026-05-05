@@ -111,8 +111,14 @@ class RegisterView extends StatelessWidget {
                     ),
                   ),
                   onTap: () async {
-                    DateTime? picked =
-                        await customDatePicker(context, DateTime(2000));
+                    DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime(2000),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(), // ❌ blocks future
+                      initialDatePickerMode:
+                          DatePickerMode.year, // ✅ fast year selection
+                    );
 
                     if (picked != null) {
                       dobController.text = picked.toString().split(" ")[0];
