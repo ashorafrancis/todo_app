@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:todo_app/widgets/custom_date_picker.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/avatar_controller.dart';
 import '../routes/app_routes.dart';
@@ -81,12 +81,8 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
                 onTap: () async {
-                  DateTime? picked = await showDatePicker(
-                    context: Get.context!,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1950),
-                    lastDate: DateTime.now(),
-                  );
+                  DateTime? picked =
+                      await customDatePicker(Get.context!, DateTime.now());
 
                   if (picked != null) {
                     dobController.text = picked.toString().split(" ")[0];

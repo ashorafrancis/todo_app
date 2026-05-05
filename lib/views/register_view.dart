@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:todo_app/widgets/custom_date_picker.dart';
 import '../controllers/auth_controller.dart';
 
 class RegisterView extends StatelessWidget {
@@ -111,12 +111,8 @@ class RegisterView extends StatelessWidget {
                     ),
                   ),
                   onTap: () async {
-                    DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime(2000),
-                      firstDate: DateTime(1950),
-                      lastDate: DateTime.now(),
-                    );
+                    DateTime? picked =
+                        await customDatePicker(context, DateTime(2000));
 
                     if (picked != null) {
                       dobController.text = picked.toString().split(" ")[0];

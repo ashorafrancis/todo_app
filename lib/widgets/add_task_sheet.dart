@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/task_controller.dart';
 import '../core/theme.dart';
+import 'package:todo_app/widgets/custom_date_picker.dart';
 
 class AddTaskSheet extends StatefulWidget {
   const AddTaskSheet({super.key});
@@ -98,12 +99,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 leading: const Icon(Icons.calendar_today),
                 title: Text(formatDate(selectedDate)),
                 onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                  );
+                  final picked = await customDatePicker(context, selectedDate);
 
                   if (picked != null) {
                     setState(() => selectedDate = picked);
@@ -114,27 +110,37 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
               const SizedBox(height: 20),
 
               // SAVE BUTTON
-              ElevatedButton(
-                onPressed: () {
-                  if (titleController.text.trim().isEmpty) return;
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (titleController.text.trim().isEmpty) return;
 
-                  Get.find<TaskController>().addTask(
-                    titleController.text.trim(),
-                    formatDate(selectedDate),
-                    selectedTag,
-                  );
+                    Get.find<TaskController>().addTask(
+                      titleController.text.trim(),
+                      formatDate(selectedDate),
+                      selectedTag,
+                    );
 
-                  Get.back();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "Save Task",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-                child: const Text(
-                  "Save Changes",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+              )
             ],
           ),
         ),

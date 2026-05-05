@@ -187,7 +187,7 @@ class TaskController extends GetxController {
 
                   Get.back();
                 },
-                child: const Text("Save"),
+                child: const Text("Save changes"),
               ),
             ),
           ],

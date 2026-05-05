@@ -66,7 +66,6 @@ class HomeView extends StatelessWidget {
           child: Obx(() {
             final allTasks = controller.tasks;
 
-            // completed tasks go bottom
             final sortedTasks = [...allTasks];
             sortedTasks.sort((a, b) {
               if (a.isDone == b.isDone) return 0;
@@ -100,8 +99,9 @@ class HomeView extends StatelessWidget {
                       ),
                     ),
 
+                    // ✅ ONLY CHANGE IS HERE (DATE ADDED)
                     subtitle: Text(
-                      t.category,
+                      "${t.category} • ${t.date}",
                       style: TextStyle(
                         fontSize: 12,
                         color: t.isDone ? Colors.grey.shade400 : Colors.grey,
@@ -110,7 +110,6 @@ class HomeView extends StatelessWidget {
 
                     onTap: () => controller.toggleTask(t.id),
 
-                    // ✅ 3 DOT MENU (REPLACED EDIT/DELETE)
                     trailing: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert, size: 18),
                       onSelected: (value) {
